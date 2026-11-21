@@ -28,16 +28,17 @@ track accompaniment(instrument=AcousticGuitarNylon) {
 ## Contents
 
 1. [Instructions for AI agents](#instructions-for-ai-agents)
-2. [Cheat sheet](#cheat-sheet)
-3. [1. Notation](#1-notation-how-to-write-notes)
-4. [2. Score structure](#2-score-structure)
-5. [3. Function reference](#3-function-reference)
-6. [4. Sound sources](#4-sound-sources-instruments-soundfonts-and-vst3)
-7. [5. The `.mix` format](#5-the-mix-format)
-8. [6. CLI and workflow](#6-cli-and-workflow)
-9. [Common mistakes](#common-mistakes)
-10. [Worked examples](#worked-examples)
-11. [Status of this guide](#status-of-this-guide)
+2. [Reading view: how code looks in the editor](#reading-view-how-code-looks-in-the-editor)
+3. [Cheat sheet](#cheat-sheet)
+4. [1. Notation](#1-notation-how-to-write-notes)
+5. [2. Score structure](#2-score-structure)
+6. [3. Function reference](#3-function-reference)
+7. [4. Sound sources](#4-sound-sources-instruments-soundfonts-and-vst3)
+8. [5. The `.mix` format](#5-the-mix-format)
+9. [6. CLI and workflow](#6-cli-and-workflow)
+10. [Common mistakes](#common-mistakes)
+11. [Worked examples](#worked-examples)
+12. [Status of this guide](#status-of-this-guide)
 
 ---
 
@@ -83,6 +84,58 @@ musicdsl lint song.mix                      # if you wrote a mix
 - Fix only the **first** error and re-lint; later errors are often side effects of the first.
 - If `musicdsl` is unavailable, say plainly that the result is **not compiler-verified** and re-check bar arithmetic by hand, bar by bar.
 - To hear or inspect: `musicdsl render song.music -o preview.wav`, `musicdsl preview song.music`, `musicdsl preview-code song.music`.
+
+---
+
+## Reading view: how code looks in the editor
+
+The editors (the VS Code / Cursor extension and the web/Android editor) do not show `.music` as plain text. They draw a **reading view** on top of it. This is display only: the file on disk, what the compiler reads, and what you copy out of the editor are always the plain text with brackets and numbers.
+
+| What you type | What the editor draws |
+|---|---|
+| `( )` around music | one **underline** per layer (each layer is ÷2); the brackets are hidden |
+| `[ ]` around music | one **overline** per layer (each layer is ×2); the brackets are hidden |
+| `1⁻¹` (negative octave) | the minus is drawn small and bold in front of a small octave digit |
+| octave digits `¹ ² ³` | octave colour, tightened spacing |
+| rest `0` | dim colour |
+| pitch outside the active key | chromatic colour (a hint, never an error) |
+| function-call `( )` and tuplet `{ }` | stay visible, coloured by nesting depth (5 colours) |
+| dynamics `pp … ff` | bold blue |
+| the note being played | yellow |
+
+When the caret touches a group its brackets reappear as plain text so you can edit them; move away and they hide again. Selecting text keeps the reading view.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="notation/images/01-reading-view-dark.png">
+  <img alt="The same music as raw text (left) and as the reading view with duration lines (right)" src="notation/images/01-reading-view-light.png">
+</picture>
+
+Count the lines: **underline = ÷2, overline = ×2, several lines multiply.**
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="notation/images/02-duration-lines-dark.png">
+  <img alt="Table of duration wrappers and how each is drawn as lines" src="notation/images/02-duration-lines-light.png">
+</picture>
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="notation/images/03-editing-caret-dark.png">
+  <img alt="Brackets reappear when the caret touches a group" src="notation/images/03-editing-caret-light.png">
+</picture>
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="notation/images/04-legend-dark.png">
+  <img alt="Legend of pitch, octave, accidental, rest, chord, dynamics, articulation and function-call colours" src="notation/images/04-legend-light.png">
+</picture>
+
+**Files in [`notation/`](notation):**
+
+- [`index.html`](notation/index.html) — an interactive page with every example above (Auto / Dark / Light). Download the folder and open it in a browser, or enable GitHub Pages for this repository and open `/notation/`.
+- [`music-dsl-notation.css`](notation/music-dsl-notation.css) — the colours (dark and light) and the rules for the lines, the small negative-octave sign and the depth colours, taken from the editor stylesheet. Reuse it to style `.music` code on your own pages; the HTML file includes a small renderer that shows how to apply it.
+- [`images/`](notation/images) — the screenshots used here, in dark and light.
+
+Turning it on or off: in VS Code / Cursor run *Music DSL: Toggle Duration Brackets as Lines* (setting `musicDsl.durationLines.enabled`); tighter notes and octave marks are `musicDsl.notationSpacing.enabled` and `musicDsl.notationSpacing.octaves`; bracket colours are `musicDsl.colorBlocks` and `musicDsl.blockColors`. The web/Android editor has a matching toggle in its command palette.
+
+The page and screenshots are a reproduction of the editor's drawing rules, not the extension itself. In the real editor the chromatic colour comes from the compiler (it knows the key); the page approximates it by colouring every pitch that has a written accidental.
 
 ---
 

@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Music DSL — how notation looks in the editor</title>
+<link rel="stylesheet" href="music-dsl-notation.css">
+<style>
+  html, body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.55 var(--font-ui); }
+  main { max-width: 1040px; margin: 0 auto; padding: 24px 20px 64px; }
+  h1 { font-size: 26px; margin: 0 0 4px; color: var(--fg-strong); }
+  h2 { font-size: 19px; margin: 40px 0 8px; color: var(--fg-strong); border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+  p, li { color: var(--fg); }
+  .lead { color: var(--fg-dim); margin: 0 0 16px; }
+  .bar { display: flex; gap: 8px; align-items: center; margin: 14px 0 6px; flex-wrap: wrap; }
+  .bar button { font: inherit; color: var(--fg); background: var(--bg-side); border: 1px solid var(--border); border-radius: 5px; padding: 4px 12px; cursor: pointer; }
+  .bar button[aria-pressed="true"] { border-color: var(--accent); color: var(--fg-strong); }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  th { color: var(--fg-dim); font-weight: 600; font-size: 13px; }
+  td.beats, td.note { color: var(--fg); font-size: 14px; }
+  .two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
+  .two > div { min-width: 0; }
+  .two .mdsl-code { font-size: 14px; }
+  @media (max-width: 820px) { .two { grid-template-columns: 1fr; } }
+  .cap { font-size: 12px; color: var(--fg-dim); margin: 0 0 4px; text-transform: uppercase; letter-spacing: .05em; }
+  .swatch { display: inline-block; width: 11px; height: 11px; border-radius: 2px; vertical-align: -1px; margin-right: 6px; }
+  code { font-family: var(--font-code); }
+</style>
+</head>
+<body>
+<main>
+  <h1>How Music DSL looks in the editor</h1>
+  <p class="lead">The editors draw <code>.music</code> text with a "reading view". Only the <em>drawing</em> changes — the file text stays exactly as written. This page reproduces that view with the real colours and rules.</p>
+
+  <div class="bar" role="group" aria-label="Theme">
+    <span style="color:var(--fg-dim)">Theme:</span>
+    <button data-theme-btn="auto" aria-pressed="true">Auto</button>
+    <button data-theme-btn="dark" aria-pressed="false">Dark</button>
+    <button data-theme-btn="light" aria-pressed="false">Light</button>
+  </div>
+
+  <h2>1. The same music, two ways</h2>
+  <p>Left: the raw text (what is stored in the file, and what you see with <em>duration lines</em> switched off). Right: the reading view. Each <code>( )</code> layer becomes an <strong>underline</strong>, each <code>[ ]</code> layer an <strong>overline</strong>, and the brackets themselves are hidden.</p>
+  <div class="two">
+    <div><p class="cap">Raw text</p><div class="mdsl-code" data-src="song" data-mode="text"></div></div>
+    <div><p class="cap">Reading view</p><div class="mdsl-code" data-src="song" data-mode="lines"></div></div>
+  </div>
+
+  <h2>2. Duration: lines instead of brackets</h2>
+  <p>One quarter note is 1 beat. Count the lines: <strong>underline = ÷2</strong>, <strong>overline = ×2</strong>. Several lines multiply.</p>
+  <table>
+    <tr><th>You type</th><th>Reading view</th><th>Beats</th><th>Name</th></tr>
+    <tr><td><code class="mdsl-code mdsl-inline" data-music="1¹" data-mode="text"></code></td><td><code class="mdsl-code mdsl-inline" data-music="1¹"></code></td><td class="beats">1</td><td class="note">quarter</td></tr>
+    <tr><td><code class="mdsl-code mdsl-inline" data-music="(1¹)" data-mode="text"></code></td><td><code class="mdsl-code mdsl-inline" data-music="(1¹)"></code></td><td class="beats">½</td><td class="note">eighth — one underline</td></tr>
+    <tr><td><code class="mdsl-code mdsl-inline" data-music="((1¹))" data-mode="text"></code></td><td><code class="mdsl-code mdsl-inline" data-music="((1¹))"></code></td><td class="beats">¼</td><td class="note">sixteenth — two underlines</td></tr>
+    <tr><td><code class="mdsl-code mdsl-inline" data-music="[1¹]" data-mode="text"></code></td><td><code class="mdsl-code mdsl-inline" data-music="[1¹]"></code></td><td class="beats">2</td><td class="note">half — one overline</td></tr>
+    <tr><td><code class="mdsl-code mdsl-inline" data-music="[[1¹]]" data-mode="text"></code></td><td><code class="mdsl-code mdsl-inline" data-music="[[1¹]]"></code></td><td class="beats">4</td><td class="note">whole — two overlines</td></tr>
+    <tr><td><code class="mdsl-code mdsl-inline" data-music="[(1¹)]" data-mode="text"></code></td><td><code class="mdsl-code mdsl-inline" data-music="[(1¹)]"></code></td><td class="beats">1</td><td class="note">×2 then ÷2 — one over, one under</td></tr>
+    <tr><td><code class="mdsl-code mdsl-inline" data-music="(1¹ 2¹ 3¹ 5¹)" data-mode="text"></code></td><td><code class="mdsl-code mdsl-inline" data-music="(1¹ 2¹ 3¹ 5¹)"></code></td><td class="beats">½ each</td><td class="note">one line spans the whole group</td></tr>
+    <tr><td><code class="mdsl-code mdsl-inline" data-music="1¹.3¹.5¹ [1⁰.3⁰.5⁰]" data-mode="text"></code></td><td><code class="mdsl-code mdsl-inline" data-music="1¹.3¹.5¹ [1⁰.3⁰.5⁰]"></code></td><td class="beats">1 and 2</td><td class="note">chords — dots join the pitches</td></tr>
+    <tr><td><code class="mdsl-code mdsl-inline" data-music="{1 2 3} {4: 5 6 7 1²}" data-mode="text"></code></td><td><code class="mdsl-code mdsl-inline" data-music="{1 2 3} {4: 5 6 7 1²}"></code></td><td class="beats">1 each</td><td class="note">tuplets — braces stay visible (coloured by depth)</td></tr>
+    <tr><td><code class="mdsl-code mdsl-inline" data-music="1¹* [1¹]*" data-mode="text"></code></td><td><code class="mdsl-code mdsl-inline" data-music="1¹* [1¹]*"></code></td><td class="beats">1½ and 3</td><td class="note">dotted — the <code>*</code> stays</td></tr>
+  </table>
+  <p style="color:var(--fg-dim)">Function-call parentheses such as <code>repeat(…)</code> are <em>not</em> duration groups. They are never hidden and are coloured by depth.</p>
+
+  <h2>3. When you edit: brackets come back</h2>
+  <p>Put the caret in or next to a group and its brackets reappear as plain text so you can edit them; move away and they hide again. Selecting text (even the whole file) keeps the reading view.</p>
+  <div class="two">
+    <div><p class="cap">Caret elsewhere</p><div class="mdsl-code" data-music="(1¹ 2¹) [3¹] | (5¹ (6¹ 5¹)) [3¹] |"></div></div>
+    <div><p class="cap">Caret touches the group <code>(5¹ …)</code></p><div class="mdsl-code" data-music="(1¹ 2¹) [3¹] | (5¹ (6¹ 5¹)) [3¹] |" data-caret-after="(5¹ "></div></div>
+  </div>
+
+  <h2>4. Symbol legend</h2>
+  <p>Pitches are digits <strong>1–7</strong> (C D E F G A B). The octave is a small superscript; a negative octave gets a small bold <code>⁻</code> so it is not confused with the digit.</p>
+  <table>
+    <tr><th>Symbol</th><th>Looks like</th><th>Meaning</th></tr>
+    <tr><td>Octave</td><td><code class="mdsl-code mdsl-inline" data-music="1⁻² 1⁻¹ 1⁰ 1¹ 1² 1³"></code></td><td class="note">C1 · C2 · C3 · <strong>C4 (middle C)</strong> · C5 · C6. No superscript means <code>¹</code>.</td></tr>
+    <tr><td>Accidentals</td><td><code class="mdsl-code mdsl-inline" data-music="4#¹ 7b⁻¹ 4=¹"></code></td><td class="note">sharp · flat (<code>b</code>) · explicit natural; drawn in the chromatic colour here</td></tr>
+    <tr><td>Rests</td><td><code class="mdsl-code mdsl-inline" data-music="0 (0) [0] [[0]]"></code></td><td class="note">silence, dim colour; same duration lines as notes</td></tr>
+    <tr><td>Chord</td><td><code class="mdsl-code mdsl-inline" data-music="[1¹.3¹.5¹] [4⁰.6⁰.1¹]"></code></td><td class="note">pitches joined with dots, no spaces</td></tr>
+    <tr><td>Dynamics</td><td><code class="mdsl-code mdsl-inline" data-music="pp p mp mf f ff"></code></td><td class="note">bold blue; apply to the music that follows</td></tr>
+    <tr><td>Hairpin</td><td><code class="mdsl-code mdsl-inline" data-music="p << 1 [2] << f | f >> 5 [4] >> pp"></code></td><td class="note">crescendo / decrescendo between two levels</td></tr>
+    <tr><td>Articulation</td><td><code class="mdsl-code mdsl-inline" data-music="!5¹ >3² _6⁰ ^[1².3².5²]* `4² /[1².3².5²] tr:7¹"></code></td><td class="note">staccato · accent · tenuto · fermata · grace · arpeggio up · trill</td></tr>
+    <tr><td>Tie / glide</td><td><code class="mdsl-code mdsl-inline" data-music="1¹ ~ 1¹ | 5¹ -> 1²"></code></td><td class="note"><code>~</code> tie or legato · <code>-&gt;</code> glissando</td></tr>
+    <tr><td>Bar</td><td><code class="mdsl-code mdsl-inline" data-music="1 2 3 4 | 5 6 7 1² |"></code></td><td class="note">barline, adds no time</td></tr>
+    <tr><td>Function call</td><td><code class="mdsl-code mdsl-inline" data-music="repeat(strum($chords, delay=15ms, dir=Up), count=2)"></code></td><td class="note">function · parameter · number+unit · enum · <code>$pattern</code>; brackets coloured by depth</td></tr>
+  </table>
+  <p><span class="swatch" style="background:var(--mu-note)"></span>note digit &nbsp;
+     <span class="swatch" style="background:var(--mu-octave)"></span>octave &nbsp;
+     <span class="swatch" style="background:var(--mu-chromatic)"></span>outside the key (a hint, never an error) &nbsp;
+     <span class="swatch" style="background:var(--mu-rest)"></span>rest &nbsp;
+     <span class="swatch" style="background:var(--mu-dynamic)"></span>dynamic &nbsp;
+     <span class="swatch" style="background:#ffd400"></span>currently playing</p>
+  <p style="color:var(--fg-dim)">In the editor the chromatic colour is decided by the compiler from the <em>active key</em> (a note that needs a sharp/flat the key does not already give). This static page cannot know the key, so it approximates: any pitch with a written accidental is drawn in that colour.</p>
+
+  <h2>5. A fuller example</h2>
+  <p>Two parts with dynamics, hairpins, articulation and chords (the <code>notation-v4</code> example).</p>
+  <div class="mdsl-code" data-src="v4" data-mode="lines"></div>
+
+  <h2>6. Switching it on and off</h2>
+  <ul>
+    <li><strong>VS Code / Cursor:</strong> command <em>Music DSL: Toggle Duration Brackets as Lines</em>, or setting <code>musicDsl.durationLines.enabled</code>.</li>
+    <li><strong>Web / Android editor:</strong> command palette → the duration-brackets toggle (stored as <code>musicdsl.compactBrackets</code> on the device).</li>
+    <li><strong>Spacing:</strong> <code>musicDsl.notationSpacing.enabled</code> and <code>musicDsl.notationSpacing.octaves</code> (default −0.14 em) tighten notes and octave marks.</li>
+    <li><strong>Bracket colours:</strong> <code>musicDsl.colorBlocks</code> and <code>musicDsl.blockColors</code> (default <code>#61afef #c678dd #98c379 #e5c07b #56b6c2</code>, five depths).</li>
+  </ul>
+</main>
+
+<script type="text/x-mdsl" id="song">
+key(1, major)
+meter(4/4)
+tempo(beat=100)
+
+def melody(shift=0) {
+  transpose((1¹ 2¹ 3¹ 5¹ 6¹ 5¹ 3¹ 2¹), semitones=$shift)
+}
+def chords { [1⁰.3⁰.5⁰] [4⁰.6⁰.1¹] }
+
+track lead(instrument=Flute) {
+  humanize(repeat($melody, count=2), time=5ms, vel=8%)
+  1¹ 2¹ [3¹] | (3¹ 2¹) 1¹ [0] |
+}
+track accompaniment(instrument=AcousticGuitarNylon) {
+  repeat(strum($chords, delay=15ms, dir=Up), count=2)
+  [[1⁻¹]] | [[6⁻²]] |
+}
+</script>
+<script type="text/x-mdsl" id="v4">
+// The two-part table, written as plain-text tracks.
+key(1, major)
+meter(4/4)
+tempo(beat=84)
+
+track upper {
+
+  p << 1¹* ~ (2¹) /[1².3².5²] << mf |
+
+  mf {1² 7¹ 6¹} !5¹ !5¹ 0 |
+
+  `4² >3² -> 1² [2¹] |
+
+  f >> tr:7¹ ^[1².3².5²]* >> pp |
+
+}
+
+track bass {
+
+  [1⁰] [3⁰.5⁰] |
+
+  [1⁰]* 5⁰ |
+
+  _6⁰ _5⁰ [4⁰] |
+
+  0 ^[1⁰.5⁰.1¹]* |
+
+}
+</script>
+
+<script>
+/* ===== theme toggle ===== */
+document.querySelectorAll('[data-theme-btn]').forEach(function (b) {
+  b.addEventListener('click', function () {
+    var v = b.getAttribute('data-theme-btn');
+    if (v === 'auto') document.documentElement.removeAttribute('data-theme'); else document.documentElement.setAttribute('data-theme', v);
+    document.querySelectorAll('[data-theme-btn]').forEach(function (o) { o.setAttribute('aria-pressed', String(o === b)); });
+  });
+});
+var q = new URLSearchParams(location.search).get('theme');
+if (q === 'dark' || q === 'light') { document.documentElement.setAttribute('data-theme', q); document.querySelectorAll('[data-theme-btn]').forEach(function (o) { o.setAttribute('aria-pressed', String(o.getAttribute('data-theme-btn') === q)); }); }
+
+/* ===== group scanner: copied from the editor (editor/duration-lines.js, web/src/editor/groups.ts) ===== */
+var dynamics = new Set(['pp', 'p', 'mp', 'mf', 'f', 'ff']);
+function scanGroups(text) {
+  var frames = [], groups = [], events = [];
+  var last = '', word = '', comment = false, quoted = false;
+  for (var i = 0; i < text.length; i++) {
+    var c = text[i];
+    if (comment) { if (c === '\n' || c === '\r') comment = false; continue; }
+    if (quoted) { if (c === '"') { quoted = false; last = '"'; } continue; }
+    if (c === '/' && text[i + 1] === '/') { comment = true; i++; continue; }
+    if (c === '"') { quoted = true; continue; }
+    if (/\s/.test(c)) continue;
+    if (c === 'b' && /[1-7]/.test(text[i - 1] || '')) { last = 'b'; word = ''; continue; }
+    if (/[A-Za-z_]/.test(c)) {
+      var start = i; while (i + 1 < text.length && /[A-Za-z_0-9]/.test(text[i + 1])) i++;
+      word = text.slice(start, i + 1); last = 'word'; continue;
+    }
+    if (c === '(' || c === '[') {
+      var music = c === '(' ? !(last === 'word' && !dynamics.has(word))
+        : !frames.length || frames[frames.length - 1].music || last === '(';
+      var frame = { close: c === '(' ? ')' : ']', music: music };
+      if (music) { frame.group = { open: i, close: -1, kind: c }; groups.push(frame.group); events.push({ pos: i, group: frame.group, opening: true }); }
+      frames.push(frame);
+    } else if (c === '{') frames.push({ close: '}', music: true });
+    else if (c === ')' || c === ']' || c === '}') {
+      var top = frames[frames.length - 1];
+      if (top && top.close === c) {
+        frames.pop();
+        if (top.group) { top.group.close = i; events.push({ pos: i, group: top.group, opening: false }); }
+      }
+    }
+    last = c; word = '';
+  }
+  var live = events.filter(function (e) { return e.group.close >= 0; });
+  var runs = [], under = 0, over = 0, from = -1;
+  live.forEach(function (event) {
+    if (from >= 0 && (under || over)) pushRun(runs, text, from, event.pos, under, over);
+    var delta = event.opening ? 1 : -1;
+    if (event.group.kind === '(') under += delta; else over += delta;
+    from = event.pos + 1;
+  });
+  return { groups: groups.filter(function (g) { return g.close >= 0; }), runs: runs };
+}
+function pushRun(runs, text, from, to, under, over) {
+  while (from < to && /\s/.test(text[from])) from++;
+  while (to > from && /\s/.test(text[to - 1])) to--;
+  if (to > from) runs.push({ from: from, to: to, under: under, over: over });
+}
+function revealedGroups(groups, caret) {
+  return new Set(groups.filter(function (g) { return caret !== null && caret <= g.close + 1 && caret >= g.open; }));
+}
+
+/* ===== line painting (same maths as the editor: 1px lines, 1.5px steps) ===== */
+var LINE = 1, STEP = 1.5;
+function lineStyle(under, over) {
+  var layers = [], sizes = [], positions = [];
+  function add(p) { layers.push('linear-gradient(var(--group-line),var(--group-line))'); sizes.push('100% ' + LINE + 'px'); positions.push(p); }
+  for (var i = 0; i < under; i++) add('0 calc(100% - ' + (i * STEP) + 'px)');
+  for (var j = 0; j < over; j++) add('0 ' + (j * STEP) + 'px');
+  var top = over ? (over - 1) * STEP + LINE : 0, bottom = under ? (under - 1) * STEP : 0;
+  return 'padding:' + top + 'px 0 ' + bottom + 'px;background-image:' + layers.join(',') + ';background-size:' + sizes.join(',') + ';background-position:' + positions.join(',') + ';background-repeat:no-repeat';
+}
+
+/* ===== tokenizer (display colouring only; the compiler is the source of truth) ===== */
+var KEYWORDS = new Set(['track', 'def', 'key', 'meter', 'tempo', 'include', 'section', 'loop', 'from', 'to', 'config', 'let', 'use', 'soundfont', 'mix', 'mixpart', 'channel', 'bus', 'master', 'render', 'stem', 'major', 'minor']);
+var SUP = '⁰¹²³⁴⁵⁶⁷⁸⁹';
+function tokenize(t) {
+  var out = [], i = 0, stack = 0;
+  function push(s, e, cls, extra) { var o = { s: s, e: e, cls: cls }; if (extra) for (var k in extra) o[k] = extra[k]; out.push(o); }
+  function prevChar(from) { var p = from - 1; while (p >= 0 && /\s/.test(t[p])) p--; return p >= 0 ? t[p] : ''; }
+  var lastNote = false;
+  while (i < t.length) {
+    var c = t[i];
+    if (c === '/' && t[i + 1] === '/') { var n = t.indexOf('\n', i); if (n < 0) n = t.length; push(i, n, 'mu-comment'); i = n; lastNote = false; continue; }
+    if (c === '"') { var q = t.indexOf('"', i + 1); q = q < 0 ? t.length : q + 1; push(i, q, 'mu-string'); i = q; lastNote = false; continue; }
+    if (/\s/.test(c)) { push(i, i + 1, 'ws'); i++; continue; }
+    if (/[A-Za-z_]/.test(c)) {
+      var j = i + 1; while (j < t.length && /[A-Za-z0-9_]/.test(t[j])) j++;
+      var word = t.slice(i, j), next = t[j], pc = prevChar(i), cls;
+      if (word === 'tr' && next === ':') { push(i, j + 1, 'mu-operator'); i = j + 1; lastNote = false; continue; }
+      if (dynamics.has(word) && next !== '=' && pc !== '=') cls = 'mu-dynamic';
+      else if (KEYWORDS.has(word) && next !== '=') cls = 'mu-keyword';
+      else if (next === '(') cls = 'mu-function';
+      else if (next === '=') cls = 'mu-parameter';
+      else if (pc === '=') cls = 'mu-enum';
+      else cls = 'mu-variable';
+      push(i, j, cls); i = j; lastNote = false; continue;
+    }
+    if (c === '$') { var k = i + 1; while (k < t.length && /[A-Za-z0-9_]/.test(t[k])) k++; push(i, k, 'mu-variable'); i = k; lastNote = false; continue; }
+    if (/[0-9]/.test(c) || ((c === '.' || c === '-') && /[0-9.]/.test(t[i + 1] || '') && !lastNote && (c === '.' || /[(,=\[ ]/.test(prevChar(i) || '(')) && !(c === '-' && t[i + 1] === '>'))) {
+      var d = i; if (c === '-') d++;
+      var e = d; while (e < t.length && /[0-9]/.test(t[e])) e++;
+      var multi = e - d > 1 || c === '.' || c === '-';
+      var unit = /^(ms|kHz|Hz|dBFS|dB|LUFS|s|%|\/\d+|:\d+)/.exec(t.slice(e));
+      if (!multi && !unit && t[e] === '.' && /[0-9]/.test(t[e + 1] || '') && (t[d] === '0' || prevChar(i) === '=')) multi = true;
+      if (multi || unit || /[89]/.test(t[d])) {
+        if (t[e] === '.' && /[0-9]/.test(t[e + 1] || '')) { e++; while (e < t.length && /[0-9]/.test(t[e])) e++; }
+        var u = /^(ms|kHz|Hz|dBFS|dB|LUFS|s|%|\/\d+|:\d+)/.exec(t.slice(e)); if (u) e += u[0].length;
+        push(i, e, 'mu-number'); i = e; lastNote = false; continue;
+      }
+      // single digit 0..7: a pitch or a rest
+      var m = d + 1, acc = '';
+      if (t[m] === '#' || t[m] === '=' || (t[m] === 'b' && !/[A-Za-z0-9_]/.test(t[m + 1] || ''))) { acc = t[m]; m++; }
+      var minus = false; if (t[m] === '⁻') { minus = true; m++; }
+      var sup = ''; while (m < t.length && SUP.indexOf(t[m]) >= 0) { sup += t[m]; m++; }
+      var digit = t[d];
+      // key(1, major) / meter(4) and a tuplet count {4: ...} hold numbers, not pitches
+      var lead = out.length >= 2 && out[out.length - 1].cls === 'bracket' && out[out.length - 1].e === i && /^(key|meter|tempo)$/.test(t.slice(out[out.length - 2].s, out[out.length - 2].e));
+      var tupletCount = t[m] === ':' && prevChar(i) === '{' && !acc && !sup;
+      if (lead || tupletCount) { push(i, d + 1, 'mu-number'); i = d + 1; lastNote = false; continue; }
+      if (digit === '0') { push(i, d + 1, 'sem-rest'); i = d + 1; lastNote = false; continue; }
+      if (!acc && !sup && !minus && prevChar(i) === '=') { push(i, d + 1, 'mu-number'); i = d + 1; lastNote = false; continue; }
+      push(i, m, 'note', { digit: digit, acc: acc, minus: minus, sup: sup });
+      i = m; lastNote = true; continue;
+    }
+    if (c === '(' || c === '[' || c === '{') { push(i, i + 1, 'bracket', { depth: stack }); stack++; i++; lastNote = false; continue; }
+    if (c === ')' || c === ']' || c === '}') { stack = Math.max(0, stack - 1); push(i, i + 1, 'bracket', { depth: stack }); i++; lastNote = true; continue; }
+    var two = t.slice(i, i + 2);
+    if (two === '<<' || two === '>>' || two === '->') { push(i, i + 2, 'mu-operator'); i += 2; lastNote = false; continue; }
+    push(i, i + 1, 'mu-operator'); lastNote = (c === '*' ); i++;
+    if (c !== '.' && c !== '*') lastNote = false;
+  }
+  return out;
+}
+
+/* ===== renderer ===== */
+function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+function tokenHtml(tok, text, hideSet) {
+  var s = text.slice(tok.s, tok.e);
+  if (tok.cls === 'ws') return esc(s);
+  if (tok.cls === 'bracket') {
+    var h = hideSet.has(tok.s);
+    return '<span class="sem-bracket sem-depth-' + (tok.depth % 5) + (h ? ' mdsl-hide' : '') + '">' + esc(s) + '</span>';
+  }
+  if (tok.cls === 'note') {
+    var chroma = tok.acc && tok.acc !== '=' ? true : tok.acc === '=';
+    var main = chroma ? 'sem-chromatic' : 'sem-note';
+    var html = '<span class="' + main + '">' + tok.digit + '</span>';
+    if (tok.acc) html += '<span class="' + (chroma ? 'sem-chromatic' : 'sem-note-mark') + '">' + tok.acc + '</span>';
+    if (tok.minus) html += '<span class="mu-octave-minus">⁻</span>';
+    if (tok.sup) html += '<span class="sem-octave">' + tok.sup + '</span>';
+    return html;
+  }
+  return '<span class="' + tok.cls + '">' + esc(s) + '</span>';
+}
+function renderMusic(text, mode, caretAt) {
+  text = text.replace(/^\n+/, '').replace(/\s+$/, '');
+  if (caretAt !== null && caretAt !== undefined && typeof caretAt === 'string') { var idx = text.indexOf(caretAt); caretAt = idx < 0 ? null : idx + caretAt.length; }
+  var tokens = tokenize(text), scan = scanGroups(text), hide = new Set();
+  if (mode === 'lines') {
+    var rev = revealedGroups(scan.groups, caretAt === undefined ? null : caretAt);
+    scan.groups.forEach(function (g) { if (!rev.has(g)) { hide.add(g.open); hide.add(g.close); } });
+  }
+  var html = '', ri = 0, openRun = null, caretDone = caretAt === null || caretAt === undefined;
+  function closeRun() { if (openRun) { html += '</span>'; openRun = null; } }
+  tokens.forEach(function (tok) {
+    var run = null;
+    if (mode === 'lines') { for (var r = 0; r < scan.runs.length; r++) { var x = scan.runs[r]; if (tok.s >= x.from && tok.e <= x.to) { run = x; break; } } }
+    if (run !== openRun) { closeRun(); if (run) { html += '<span class="cm-group-lines" style="' + lineStyle(run.under, run.over) + '">'; openRun = run; } }
+    if (!caretDone && tok.s >= caretAt) { closeRun(); html += '<span class="mdsl-caret"></span>'; caretDone = true; if (run) { html += '<span class="cm-group-lines" style="' + lineStyle(run.under, run.over) + '">'; openRun = run; } }
+    html += tokenHtml(tok, text, hide);
+  });
+  closeRun();
+  if (!caretDone) html += '<span class="mdsl-caret"></span>';
+  return html;
+}
+
+document.querySelectorAll('[data-src],[data-music]').forEach(function (el) {
+  var src = el.getAttribute('data-src') ? document.getElementById(el.getAttribute('data-src')).textContent : el.getAttribute('data-music');
+  var caret = el.getAttribute('data-caret-after');
+  el.innerHTML = renderMusic(src, el.getAttribute('data-mode') || 'lines', caret);
+  el.setAttribute('aria-label', 'Music DSL: ' + src.trim().slice(0, 120));
+});
+</script>
+</body>
+</html>
