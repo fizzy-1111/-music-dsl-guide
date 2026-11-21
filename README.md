@@ -125,7 +125,7 @@ The editors (the VS Code / Cursor extension and the web/Android editor) do not s
 | `1⁻¹` (negative octave) | the minus is drawn small and bold in front of a small octave digit |
 | octave digits `¹ ² ³` | octave colour, tightened spacing |
 | rest `0` | dim colour |
-| pitch outside the active key | chromatic colour (a hint, never an error) |
+| a pitch with a sharp/flat from the key, or a written accidental that leaves the key's scale | chromatic colour on the **digit** only (a hint, never an error; [exact rule below](#what-turns-red-the-chromatic-colour)) |
 | function-call `( )` and tuplet `{ }` | stay visible, coloured by nesting depth (5 colours) |
 | dynamics `pp … ff` | bold blue |
 | the note being played | yellow |
@@ -154,6 +154,25 @@ Count the lines: **underline = ÷2, overline = ×2, several lines multiply.**
   <img alt="Legend of pitch, octave, accidental, rest, chord, dynamics, articulation and function-call colours" src="notation/images/04-legend-light.png">
 </picture>
 
+#### What turns red: the chromatic colour
+
+The red digit is **not** "a note outside the key" and not "any note with a sharp". The compiler decides it for every pitch, using the active key. Only the **digit** is coloured; the `#` / `b` / `=` mark and the octave keep their own colours.
+
+| Written | Red when… | Example in G major (`key(5, major)`, F is F♯) |
+|---|---|---|
+| no accidental | the key signature **alters** that degree (the sharp/flat comes from the key) | plain `4` (F♯) → **red**; plain `5` → normal |
+| with `#` `b` `=` | the sounding pitch is **outside the key's scale** | `4=` (F), `1#` (C♯), `2#` (D♯), `7b` → **red** |
+| with `#` `b` `=` | never, if it only **restates** a pitch the key already has | `4#` (F♯), `7=` (B) → normal |
+
+So in C major plain notes are never red, while in G major every plain `4` is. `section { key(…) }` changes the key for that passage only. With a track option `transpose=N` the colours follow the *sounding* key (C major with `transpose=2` reads as D major, so `3` and `7` turn red). Notes that are playing are drawn yellow instead.
+
+Verified against the compiler's semantic highlighting on all 30 major and natural-minor keys × every degree written plain, `#`, `b` and `=` (840 pitches, no differences).
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="notation/images/05-chromatic-rule-dark.png">
+  <img alt="Chromatic colour rule with G major and C major examples" src="notation/images/05-chromatic-rule-light.png">
+</picture>
+
 **Files in [`notation/`](notation):**
 
 - [`index.html`](notation/index.html) — an interactive page with every example above (Auto / Dark / Light). Download the folder and open it in a browser, or enable GitHub Pages for this repository and open `/notation/`.
@@ -162,7 +181,7 @@ Count the lines: **underline = ÷2, overline = ×2, several lines multiply.**
 
 Turning it on or off: in VS Code / Cursor run *Music DSL: Toggle Duration Brackets as Lines* (setting `musicDsl.durationLines.enabled`); tighter notes and octave marks are `musicDsl.notationSpacing.enabled` and `musicDsl.notationSpacing.octaves`; bracket colours are `musicDsl.colorBlocks` and `musicDsl.blockColors`. The web/Android editor has a matching toggle in its command palette.
 
-The page and screenshots are a reproduction of the editor's drawing rules, not the extension itself. In the real editor the chromatic colour comes from the compiler (it knows the key); the page approximates it by colouring every pitch that has a written accidental.
+The page and screenshots reproduce the editor's drawing rules (they are not the extension itself). The chromatic colouring on the page follows the compiler's rule and was cross-checked against the compiler on all 30 keys.
 
 ---
 

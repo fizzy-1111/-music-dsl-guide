@@ -10,7 +10,8 @@
  *   superscript octave digits        -> octave colour, tightened spacing
  *   negative octave sign  ⁻          -> drawn small and bold, attached to the digit
  *   rest 0                           -> dim colour
- *   pitch outside the active key     -> chromatic colour (a hint, not an error)
+ *   chromatic pitch digit            -> chromatic colour: no written accidental but the key alters the degree,
+ *                                       or a written accidental that lands outside the key's scale (a hint, not an error)
  *   ( ) [ ] { } that are visible     -> coloured by nesting depth
  *
  * Usage: wrap tokens in the classes below (see notation/index.html for a renderer that does it for you).
