@@ -1,0 +1,3 @@
+150f321c8e4d9a084a7cdee19d12289ec06ee40d8167e54e017e3b959db0543f  linux-x64/musicdsl-0.21.10-linux-x64.tar.gz
+74f14c0c982d8f24181040a83d401b126c0e671b85a4e565f1414536868b9db5  win-x64/music-dsl-0.21.10-win32-x64.vsix
+fe658f61a6d446290f2eaf0c1f3ff4bbbfebca6209fdbe5e1bcce806c02d0854  win-x64/musicdsl-0.21.10-win-x64.zip

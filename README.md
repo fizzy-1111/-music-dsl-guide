@@ -82,8 +82,35 @@ musicdsl lint song.mix                      # if you wrote a mix
 ```
 
 - Fix only the **first** error and re-lint; later errors are often side effects of the first.
-- If `musicdsl` is unavailable, say plainly that the result is **not compiler-verified** and re-check bar arithmetic by hand, bar by bar.
+- If `musicdsl` is unavailable, fetch the [prebuilt compiler](#prebuilt-compiler-no-net-needed) below (no .NET needed). Only if that is impossible, say plainly that the result is **not compiler-verified** and re-check bar arithmetic by hand, bar by bar.
 - To hear or inspect: `musicdsl render song.music -o preview.wav`, `musicdsl preview song.music`, `musicdsl preview-code song.music`.
+
+### Prebuilt compiler (no .NET needed)
+
+Ready-to-run **self-contained** builds of the compiler are stored in this repository under [`dist/`](dist). They include the runtime and the default SoundFont (GeneralUser GS), so nothing else has to be installed. Version 0.21.10. Checksums: [`dist/SHA256SUMS.txt`](dist/SHA256SUMS.txt).
+
+| File | For |
+|---|---|
+| `dist/linux-x64/musicdsl-0.21.10-linux-x64.tar.gz` | Linux x64 (CI, cloud sessions, AI agents). No .NET, no libicu. |
+| `dist/win-x64/musicdsl-0.21.10-win-x64.zip` | Windows x64 command line (`musicdsl.exe`) |
+| `dist/win-x64/music-dsl-0.21.10-win32-x64.vsix` | VS Code / Cursor extension for Windows x64 with the compiler inside |
+
+**Linux / AI agent: fetch only the Linux build and lint a score**
+
+```text
+git clone --depth 1 --filter=blob:none --sparse https://github.com/fizzy-1111/-music-dsl-guide guide
+git -C guide sparse-checkout set dist/linux-x64
+mkdir -p ~/musicdsl && tar -xzf guide/dist/linux-x64/musicdsl-0.21.10-linux-x64.tar.gz -C ~/musicdsl
+~/musicdsl/musicdsl/musicdsl lint song.music --strict-bars
+```
+
+Or download one file without git: `curl -L -o musicdsl.tar.gz https://github.com/fizzy-1111/-music-dsl-guide/raw/main/dist/linux-x64/musicdsl-0.21.10-linux-x64.tar.gz`, then `tar -xzf musicdsl.tar.gz`.
+
+Keep the `soundfonts` folder next to the executable (it is the default SoundFont). Every command in this guide that starts with `musicdsl` works the same with `~/musicdsl/musicdsl/musicdsl` (`musicdsl.exe` on Windows), for example `render song.music -o preview.wav`.
+
+**Windows:** unzip `musicdsl-0.21.10-win-x64.zip` and run `musicdsl.exe lint song.music`; or in VS Code / Cursor use *Extensions → … → Install from VSIX…* and pick the `.vsix` (or `code --install-extension <file>`). The extension starts the bundled `.exe` directly.
+
+Not included: the native audio engine (insert effects and VST3 inserts in `.mix` are skipped with warning `MXW300`), VST3 instruments and PDF import. Verified: the Linux build passes the compiler's own 574-test self-test and lints and renders the examples from a clean environment. The Windows build was produced the same way but could not be run where it was built; the executables are not code-signed, so Windows SmartScreen or antivirus may warn.
 
 ---
 
